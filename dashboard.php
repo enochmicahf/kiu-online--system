@@ -39,73 +39,43 @@ $current_page = 'dashboard';
 include 'includes/header.php';
 ?>
 
-<div class="row g-4 mb-4">
+<div class="row mb-4">
     <?php if ($role == 'admin'): ?>
-        <div class="col-md-3">
-            <div class="card stat-card bg-primary">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase small">Total Users</h6>
-                        <h2 class="mb-0"><?php echo $total_users; ?></h2>
-                    </div>
-                    <i class="fas fa-users fa-2x opacity-50"></i>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white p-3 text-center h-100">
+                <h6 class="text-uppercase small">Total Users</h6>
+                <h2><?php echo $total_users; ?></h2>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card bg-gold">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase small">Total Complaints</h6>
-                        <h2 class="mb-0"><?php echo $total_complaints; ?></h2>
-                    </div>
-                    <i class="fas fa-file-alt fa-2x opacity-50"></i>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark p-3 text-center h-100">
+                <h6 class="text-uppercase small">Total Complaints</h6>
+                <h2><?php echo $total_complaints; ?></h2>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card bg-danger">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase small">Pending</h6>
-                        <h2 class="mb-0"><?php echo $pending_complaints; ?></h2>
-                    </div>
-                    <i class="fas fa-clock fa-2x opacity-50"></i>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white p-3 text-center h-100">
+                <h6 class="text-uppercase small">Pending</h6>
+                <h2><?php echo $pending_complaints; ?></h2>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stat-card bg-success">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase small">Resolved</h6>
-                        <h2 class="mb-0"><?php echo $resolved_complaints; ?></h2>
-                    </div>
-                    <i class="fas fa-check-circle fa-2x opacity-50"></i>
-                </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white p-3 text-center h-100">
+                <h6 class="text-uppercase small">Resolved</h6>
+                <h2><?php echo $resolved_complaints; ?></h2>
             </div>
         </div>
     <?php elseif ($role == 'student'): ?>
-        <div class="col-md-6">
-            <div class="card stat-card bg-primary">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase small">My Total Complaints</h6>
-                        <h2 class="mb-0"><?php echo $user_total_count; ?></h2>
-                    </div>
-                    <i class="fas fa-paper-plane fa-2x opacity-50"></i>
-                </div>
+        <div class="col-md-6 mb-3">
+            <div class="card bg-primary text-white p-3 text-center">
+                <h6 class="text-uppercase small">My Total Complaints</h6>
+                <h2><?php echo $user_total_count; ?></h2>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card stat-card bg-gold">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase small">My Pending Complaints</h6>
-                        <h2 class="mb-0"><?php echo $user_pending_count; ?></h2>
-                    </div>
-                    <i class="fas fa-clock fa-2x opacity-50"></i>
-                </div>
+        <div class="col-md-6 mb-3">
+            <div class="card bg-warning text-dark p-3 text-center">
+                <h6 class="text-uppercase small">My Pending Complaints</h6>
+                <h2><?php echo $user_pending_count; ?></h2>
             </div>
         </div>
     <?php endif; ?>
@@ -113,17 +83,17 @@ include 'includes/header.php';
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center p-3">
-                <h5 class="mb-0"><i class="fas fa-list me-2"></i> Recent Complaints</h5>
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Complaints</h5>
                 <?php if ($role == 'student'): ?>
-                    <a href="submit_complaint.php" class="btn btn-primary btn-sm">Submit New</a>
+                    <a href="submit_complaint.php" class="btn btn-primary btn-sm">Submit New Complaint</a>
                 <?php endif; ?>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
                                 <?php if ($role != 'student') echo "<th>Student</th>"; ?>
                                 <th>Title</th>
