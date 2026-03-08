@@ -73,29 +73,18 @@ include 'includes/header.php';
 ?>
 
 <div class="dashboard-wrapper">
-    <!-- Header with Breadcrumbs/Search -->
-    <div class="row align-items-center mb-4">
-        <div class="col-md-6">
-            <h3 class="fw-bold text-white mb-1">Dashboard</h3>
-            <p class="text-secondary small mb-0">Welcome back, <?php echo htmlspecialchars($username); ?>!</p>
-        </div>
-        <div class="col-md-6 text-end">
-            <div class="d-flex justify-content-end gap-2">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
-                </div>
-                <div class="profile-avatar">
-                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($username); ?>&background=random" alt="User" class="rounded-circle" width="35">
-                </div>
-            </div>
+    <!-- Header with Welcome Message -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-12">
+            <h2 class="fw-bold text-white mb-1">Dashboard Overview</h2>
+            <p class="text-secondary small mb-0">Hello, <?php echo htmlspecialchars($username); ?>. Here's what's happening today.</p>
         </div>
     </div>
 
     <!-- Stats Grid -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="stat-card">
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4">
+            <div class="card stat-card mb-0 h-100">
                 <div class="stat-info">
                     <p class="stat-label">MY TOTAL COMPLAINTS</p>
                     <h2 class="stat-value"><?php echo $total_complaints; ?></h2>
@@ -105,8 +94,8 @@ include 'includes/header.php';
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="stat-card">
+        <div class="col-lg-4">
+            <div class="card stat-card mb-0 h-100">
                 <div class="stat-info">
                     <p class="stat-label">MY PENDING COMPLAINTS</p>
                     <h2 class="stat-value"><?php echo $pending_complaints; ?></h2>
@@ -116,8 +105,8 @@ include 'includes/header.php';
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="stat-card">
+        <div class="col-lg-4">
+            <div class="card stat-card mb-0 h-100">
                 <div class="stat-info">
                     <p class="stat-label">RESOLVED COMPLAINTS</p>
                     <h2 class="stat-value text-success"><?php echo $resolved_complaints; ?></h2>
@@ -129,55 +118,56 @@ include 'includes/header.php';
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <!-- Main Complaints Table -->
-        <div class="col-md-8">
-            <div class="card bg-dark border-secondary" id="complaints-table">
-                <div class="card-header bg-transparent border-secondary d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 text-white"><i class="fas fa-list-ul me-2"></i> Recent Complaints</h5>
+        <div class="col-xl-8">
+            <div class="card h-100" id="complaints-table">
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 text-white fw-bold"><i class="fas fa-list-ul me-2 text-primary"></i> Recent Complaints</h5>
                     <?php if ($role == 'student'): ?>
-                        <a href="submit_complaint.php" class="btn btn-primary btn-sm">Submit New</a>
+                        <a href="submit_complaint.php" class="btn btn-primary btn-sm px-4">Submit New</a>
                     <?php endif; ?>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-dark table-hover mb-0">
                             <thead>
-                                <tr class="text-secondary small">
-                                    <th class="border-secondary px-3">Title</th>
-                                    <th class="border-secondary">Category</th>
-                                    <th class="border-secondary">Status</th>
-                                    <th class="border-secondary">Date</th>
-                                    <th class="border-secondary text-end px-3">Action</th>
+                                <tr>
+                                    <th>Title & Description</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Date Submitted</th>
+                                    <th class="text-end">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if (count($complaints) > 0): ?>
                                     <?php foreach ($complaints as $c): ?>
                                         <tr>
-                                            <td class="px-3 border-secondary text-white fw-medium">
-                                                <?php echo htmlspecialchars($c['title']); ?>
+                                            <td>
+                                                <div class="fw-bold text-white mb-1"><?php echo htmlspecialchars($c['title']); ?></div>
                                                 <?php if (isset($c['student_username'])): ?>
-                                                    <br><small class="text-secondary">By: <?php echo htmlspecialchars($c['student_username']); ?></small>
+                                                    <div class="text-secondary small">Submitted by: <span class="text-info"><?php echo htmlspecialchars($c['student_username']); ?></span></div>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="border-secondary text-secondary small"><?php echo htmlspecialchars($c['category_name']); ?></td>
-                                            <td class="border-secondary">
-                                                <span class="badge rounded-pill badge-status-<?php echo $c['status']; ?>">
+                                            <td><span class="text-secondary small"><?php echo htmlspecialchars($c['category_name']); ?></span></td>
+                                            <td>
+                                                <span class="badge rounded-pill badge-status-<?php echo $c['status']; ?> px-3 py-2 small">
                                                     <?php echo ucfirst($c['status']); ?>
                                                 </span>
                                             </td>
-                                            <td class="border-secondary text-secondary small">
-                                                <?php echo date('M d, Y', strtotime($c['created_at'])); ?>
-                                            </td>
-                                            <td class="border-secondary text-end px-3">
-                                                <a href="view_complaint.php?id=<?php echo $c['id']; ?>" class="btn btn-outline-info btn-xs py-0 px-2 small border-info">View</a>
+                                            <td><span class="text-secondary small"><?php echo date('M d, Y', strtotime($c['created_at'])); ?></span></td>
+                                            <td class="text-end">
+                                                <a href="view_complaint.php?id=<?php echo $c['id']; ?>" class="btn btn-outline-info btn-sm px-3">View Details</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="5" class="text-center py-4 text-secondary">No complaints found.</td>
+                                        <td colspan="5" class="text-center py-5 text-secondary">
+                                            <i class="fas fa-folder-open fs-2 mb-3"></i><br>
+                                            No complaints found in the database.
+                                        </td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -188,44 +178,47 @@ include 'includes/header.php';
         </div>
 
         <!-- Sidebar Components -->
-        <div class="col-md-4">
+        <div class="col-xl-4">
             <!-- System Status Card -->
-            <div class="card bg-dark border-secondary mb-4">
-                <div class="card-header bg-transparent border-secondary">
-                    <h6 class="mb-0 text-white">System Status</h6>
+            <div class="card mb-4 border-0" style="background: linear-gradient(135deg, #111827 0%, #1f2937 100%);">
+                <div class="card-header border-0 pb-0">
+                    <h6 class="mb-0 text-white fw-bold">System Status</h6>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="text-secondary small">Database Connection</span>
-                        <span class="badge bg-success small">Connected</span>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3">Connected</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="text-secondary small">Session Status</span>
-                        <span class="badge bg-primary small">Active</span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3">Active</span>
                     </div>
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center">
                         <span class="text-secondary small">Last Action</span>
-                        <span class="text-white small">Just now</span>
+                        <span class="text-white small fw-semibold">Just now</span>
                     </div>
                 </div>
             </div>
 
             <!-- Announcements/Quick Tips -->
-            <div class="card bg-dark border-secondary">
-                <div class="card-header bg-transparent border-secondary">
-                    <h6 class="mb-0 text-white">Announcements</h6>
+            <div class="card mb-0">
+                <div class="card-header">
+                    <h6 class="mb-0 text-white fw-bold">Recent Announcements</h6>
                 </div>
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush bg-transparent">
-                        <li class="list-group-item bg-transparent border-secondary py-3">
-                            <h6 class="text-info small fw-bold mb-1">New System Update</h6>
-                            <p class="text-secondary x-small mb-0">The complaint management system has been updated with a new dark theme for better visibility.</p>
+                        <li class="list-group-item bg-transparent border-secondary py-3 px-4">
+                            <h6 class="text-info small fw-bold mb-1">System Version 2.0 Launched</h6>
+                            <p class="text-secondary small mb-0 opacity-75">The complaint management system has been updated with a high-fidelity dark theme for better visibility.</p>
                         </li>
-                        <li class="list-group-item bg-transparent border-secondary py-3">
-                            <h6 class="text-warning small fw-bold mb-1">KIU Exam Support</h6>
-                            <p class="text-secondary x-small mb-0">Academic complaints regarding the upcoming exams should be submitted at least 48 hours before the exam date.</p>
+                        <li class="list-group-item bg-transparent border-secondary py-3 px-4">
+                            <h6 class="text-warning small fw-bold mb-1">Upcoming Maintenance</h6>
+                            <p class="text-secondary small mb-0 opacity-75">Scheduled database maintenance this Sunday between 02:00 AM and 04:00 AM. System may be intermittent.</p>
                         </li>
                     </ul>
+                </div>
+                <div class="card-footer bg-transparent border-secondary text-center">
+                    <a href="#" class="text-primary small text-decoration-none fw-bold">View All Announcements <i class="fas fa-chevron-right ms-1"></i></a>
                 </div>
             </div>
         </div>

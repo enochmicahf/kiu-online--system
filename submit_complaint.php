@@ -36,43 +36,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!$error) {
         $stmt = $pdo->prepare("INSERT INTO complaints (student_id, category_id, title, description, attachment) VALUES (?, ?, ?, ?, ?)");
         if ($stmt->execute([$student_id, $category_id, $title, $description, $attachment_path])) {
-        // Simple notification for staff (this could be improved to notify specific staff)
-        $stmt_staff = $pdo->query("SELECT id FROM users WHERE role = 'staff'");
-        while ($staff = $stmt_staff->fetch()) {
-            notify($staff['id'], "New complaint submitted by " . $_SESSION['username'] . ": " . $title);
-        }
-            $success = "Complaint submitted successfully. <a href='dashboard.php'>Go to Dashboard</a>";
+            // Simple notification for staff
+            $stmt_staff = $pdo->query("SELECT id FROM users WHERE role = 'staff'");
+            while ($staff = $stmt_staff->fetch()) {
+                notify($staff['id'], "New complaint submitted by " . $_SESSION['username'] . ": " . $title);
+            }
+            $success = "Complaint submitted successfully! <a href='dashboard.php' class='text-primary fw-bold text-decoration-none'>Go to Dashboard</a>";
         } else {
-            $error = "Failed to submit complaint.";
+            $error = "Failed to submit complaint. Please try again.";
         }
     }
 }
 
-$page_title = "Submit Complaint - KIU Complaints";
+$page_title = "Submit Complaint - KIU Support";
+$current_page = 'complaints';
 include 'includes/header.php';
 ?>
 
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
+    <div class="col-xl-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3 bg-transparent border-secondary">
+                <h4 class="mb-0 text-white fw-bold"><i class="fas fa-edit me-2 text-primary"></i> Submit a Complaint</h4>
+                <p class="text-secondary small mb-0 mt-1">Provide as much detail as possible to help us resolve your issue.</p>
+            </div>
             <div class="card-body">
-                <h3>Submit a Complaint</h3>
                 <?php if ($error): ?>
-                    <div class="alert alert-danger"><?php echo $error; ?></div>
+                    <div class="alert alert-danger border-0 py-3 mb-4 rounded-3 d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle me-3 fs-4"></i>
+                        <div><?php echo $error; ?></div>
+                    </div>
                 <?php endif; ?>
                 <?php if ($success): ?>
-                    <div class="alert alert-success"><?php echo $success; ?></div>
+                    <div class="alert alert-success border-0 py-3 mb-4 rounded-3 d-flex align-items-center">
+                        <i class="fas fa-check-circle me-3 fs-4"></i>
+                        <div><?php echo $success; ?></div>
+                    </div>
                 <?php endif; ?>
 
                 <form method="POST" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label class="form-label">Title</label>
-                        <input type="text" name="title" class="form-control" required placeholder="Short summary of your issue">
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase mb-2">Complaint Title</label>
+                        <input type="text" name="title" class="form-control" required placeholder="A short, descriptive summary of the issue">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Category</label>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase mb-2">Category</label>
                         <select name="category_id" class="form-select" required>
-                            <option value="">Select Category</option>
+                            <option value="">-- Select Category --</option>
                             <?php
                             $stmt = $pdo->query("SELECT * FROM categories");
                             while ($cat = $stmt->fetch()) {
@@ -81,17 +92,23 @@ include 'includes/header.php';
                             ?>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Detailed Description</label>
-                        <textarea name="description" class="form-control" rows="5" required></textarea>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase mb-2">Detailed Description</label>
+                        <textarea name="description" class="form-control" rows="8" required placeholder="Describe the problem, when it occurred, and any steps you've already taken..."></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Attachment (Optional)</label>
-                        <input type="file" name="attachment" class="form-control">
+
+                    <div class="mb-5">
+                        <label class="form-label fw-semibold text-secondary small text-uppercase mb-2">Supporting Documents (Optional)</label>
+                        <div class="input-group">
+                            <input type="file" name="attachment" class="form-control">
+                            <span class="input-group-text bg-dark border-secondary text-secondary small">JPG, PNG, PDF, DOC</span>
+                        </div>
                     </div>
-                    <div class="d-grid gap-2 d-md-block">
-                        <button type="submit" class="btn btn-primary">Submit Complaint</button>
-                        <a href="dashboard.php" class="btn btn-secondary">Cancel</a>
+
+                    <div class="d-flex justify-content-end gap-3 pt-3">
+                        <a href="dashboard.php" class="btn btn-outline-secondary px-4 fw-bold">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 py-2">Submit Complaint</button>
                     </div>
                 </form>
             </div>
