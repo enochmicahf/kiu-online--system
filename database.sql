@@ -7,6 +7,9 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('student', 'staff', 'admin') DEFAULT 'student',
+    reg_number VARCHAR(50),
+    year INT,
+    semester INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -23,7 +26,8 @@ CREATE TABLE complaints (
     title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
     attachment VARCHAR(255),
-    status ENUM('pending', 'in_progress', 'resolved', 'closed') DEFAULT 'pending',
+    status ENUM('pending', 'approved', 'in_progress', 'resolved', 'closed') DEFAULT 'pending',
+    admin_remarks TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,

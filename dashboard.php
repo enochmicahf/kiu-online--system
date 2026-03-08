@@ -137,6 +137,7 @@ include 'includes/header.php';
                             <?php foreach ($recent_complaints as $c):
                                 $status_class = match($c['status']) {
                                     'pending' => 'bg-warning',
+                                    'approved' => 'bg-primary',
                                     'in_progress' => 'bg-info',
                                     'resolved' => 'bg-success',
                                     'closed' => 'bg-secondary',

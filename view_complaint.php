@@ -12,7 +12,7 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 // Fetch complaint details
-$stmt = $pdo->prepare("SELECT c.*, u.username as student_name, cat.name as category_name
+$stmt = $pdo->prepare("SELECT c.*, u.username as student_name, u.reg_number, u.year, u.semester, cat.name as category_name
                        FROM complaints c
                        JOIN users u ON c.student_id = u.id
                        LEFT JOIN categories cat ON c.category_id = cat.id
@@ -24,17 +24,17 @@ if (!$complaint || ($role == 'student' && $complaint['student_id'] != $user_id))
     die("Unauthorized or not found.");
 }
 
-// Handle Status Update (Staff only)
+// Handle Status Update and Admin Remarks (Staff only)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status']) && $role != 'student') {
     $new_status = $_POST['status'];
-    if ($new_status != $complaint['status']) {
-        $stmt = $pdo->prepare("UPDATE complaints SET status = ? WHERE id = ?");
-        $stmt->execute([$new_status, $id]);
+    $admin_remarks = trim($_POST['admin_remarks']);
 
-        notify($complaint['student_id'], "Your complaint status has been updated to " . ucfirst(str_replace('_', ' ', $new_status)));
-        header("Location: view_complaint.php?id=$id&msg=updated");
-        exit();
-    }
+    $stmt = $pdo->prepare("UPDATE complaints SET status = ?, admin_remarks = ? WHERE id = ?");
+    $stmt->execute([$new_status, $admin_remarks, $id]);
+
+    notify($complaint['student_id'], "Your complaint #$id has been reviewed. Status: " . ucfirst(str_replace('_', ' ', $new_status)));
+    header("Location: view_complaint.php?id=$id&msg=updated");
+    exit();
 }
 
 // Handle Feedback (Student only)
@@ -69,12 +69,25 @@ include 'includes/header.php';
                 </div>
                 <hr>
                 <p><strong>Category:</strong> <?php echo htmlspecialchars($complaint['category_name']); ?></p>
-                <p><strong>Submitted by:</strong> <?php echo htmlspecialchars($complaint['student_name']); ?> on <?php echo $complaint['created_at']; ?></p>
+                <p>
+                    <strong>Submitted by:</strong> <?php echo htmlspecialchars($complaint['student_name']); ?>
+                    <?php if ($complaint['reg_number']): ?>
+                        (<?php echo htmlspecialchars($complaint['reg_number']); ?>, Year <?php echo $complaint['year']; ?>, Sem <?php echo $complaint['semester']; ?>)
+                    <?php endif; ?>
+                    on <?php echo $complaint['created_at']; ?>
+                </p>
                 <div class="p-3 bg-light rounded mb-3">
                     <?php echo nl2br(htmlspecialchars($complaint['description'])); ?>
                 </div>
                 <?php if ($complaint['attachment']): ?>
                     <p><strong>Attachment:</strong> <a href="<?php echo $complaint['attachment']; ?>" target="_blank" class="btn btn-outline-dark btn-sm">View File</a></p>
+                <?php endif; ?>
+
+                <?php if ($complaint['admin_remarks']): ?>
+                    <div class="mt-4 p-3 bg-gold-light border-start border-4 border-warning rounded">
+                        <h5><i class="fas fa-comment-dots me-2"></i> Staff Feedback</h5>
+                        <p class="mb-0"><?php echo nl2br(htmlspecialchars($complaint['admin_remarks'])); ?></p>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -116,18 +129,24 @@ include 'includes/header.php';
     <div class="col-md-4">
         <?php if ($role != 'student'): ?>
             <div class="card shadow mb-4">
-                <div class="card-header bg-primary text-white">Update Status</div>
+                <div class="card-header bg-primary text-white">Review Complaint</div>
                 <div class="card-body">
                     <form method="POST">
                         <div class="mb-3">
+                            <label class="form-label">Update Status</label>
                             <select name="status" class="form-select">
                                 <option value="pending" <?php echo $complaint['status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                <option value="approved" <?php echo $complaint['status'] == 'approved' ? 'selected' : ''; ?>>Approved</option>
                                 <option value="in_progress" <?php echo $complaint['status'] == 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
                                 <option value="resolved" <?php echo $complaint['status'] == 'resolved' ? 'selected' : ''; ?>>Resolved</option>
                                 <option value="closed" <?php echo $complaint['status'] == 'closed' ? 'selected' : ''; ?>>Closed</option>
                             </select>
                         </div>
-                        <button type="submit" name="update_status" class="btn btn-success w-100">Update Status</button>
+                        <div class="mb-3">
+                            <label class="form-label">Staff Feedback/Remarks</label>
+                            <textarea name="admin_remarks" class="form-control" rows="4"><?php echo htmlspecialchars($complaint['admin_remarks'] ?? ''); ?></textarea>
+                        </div>
+                        <button type="submit" name="update_status" class="btn btn-success w-100">Save Review</button>
                     </form>
                 </div>
             </div>

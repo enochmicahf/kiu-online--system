@@ -12,9 +12,12 @@ $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
     $new_email = trim($_POST['email']);
+    $reg_number = trim($_POST['reg_number'] ?? '');
+    $year = $_POST['year'] ?? null;
+    $semester = $_POST['semester'] ?? null;
 
-    $stmt = $pdo->prepare("UPDATE users SET email = ? WHERE id = ?");
-    if ($stmt->execute([$new_email, $user_id])) {
+    $stmt = $pdo->prepare("UPDATE users SET email = ?, reg_number = ?, year = ?, semester = ? WHERE id = ?");
+    if ($stmt->execute([$new_email, $reg_number, $year, $semester, $user_id])) {
         $message = "Profile updated successfully!";
     } else {
         $message = "Error updating profile.";
@@ -51,6 +54,32 @@ include 'includes/header.php';
                         <label class="form-label">Email Address</label>
                         <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" required>
                     </div>
+
+                    <?php if ($user['role'] == 'student'): ?>
+                    <div class="mb-3">
+                        <label class="form-label">Registration Number</label>
+                        <input type="text" name="reg_number" class="form-control" value="<?php echo htmlspecialchars($user['reg_number'] ?? ''); ?>" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Year</label>
+                            <select name="year" class="form-select">
+                                <?php for($i=1; $i<=5; $i++): ?>
+                                    <option value="<?php echo $i; ?>" <?php echo ($user['year'] == $i) ? 'selected' : ''; ?>>Year <?php echo $i; ?></option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Semester</label>
+                            <select name="semester" class="form-select">
+                                <?php for($i=1; $i<=3; $i++): ?>
+                                    <option value="<?php echo $i; ?>" <?php echo ($user['semester'] == $i) ? 'selected' : ''; ?>>Semester <?php echo $i; ?></option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                     <div class="mb-3">
                         <label class="form-label">Role</label>
                         <input type="text" class="form-control" value="<?php echo ucfirst($user['role']); ?>" disabled>
