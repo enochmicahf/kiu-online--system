@@ -1,0 +1,42 @@
+:root {
+    --kiu-blue: #003366;
+    --kiu-gold: #FFD700;
+}
+
+body {
+    background-color: #f4f7f6;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar {
+    background-color: var(--kiu-blue) !important;
+    border-bottom: 4px solid var(--kiu-gold);
+}
+
+.btn-primary {
+    background-color: var(--kiu-blue);
+    border-color: var(--kiu-blue);
+}
+
+.btn-primary:hover {
+    background-color: #002244;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.badge {
+    border-radius: 20px;
+}
+
+footer {
+    margin-top: 50px;
+    padding: 20px 0;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    color: #777;
+}
