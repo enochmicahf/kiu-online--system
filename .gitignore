@@ -8,3 +8,4 @@ static/
 venv/
 .idea/
 .vscode/
+uploads/
