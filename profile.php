@@ -36,44 +36,44 @@ include 'includes/header.php';
 
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white p-3">
-                <h5 class="mb-0"><i class="fas fa-user me-2"></i> My Profile</h5>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-transparent border-secondary p-3">
+                <h5 class="mb-0 text-white fw-bold"><i class="fas fa-user-circle me-2 text-primary"></i> My Profile</h5>
             </div>
             <div class="card-body">
                 <?php if ($message): ?>
-                    <div class="alert alert-info"><?php echo $message; ?></div>
+                    <div class="alert alert-info border-0 py-2 small"><?php echo $message; ?></div>
                 <?php endif; ?>
                 <form method="POST">
                     <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($user['username']); ?>" disabled>
-                        <small class="text-muted">Username cannot be changed.</small>
+                        <label class="form-label small text-secondary fw-semibold">Username</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary opacity-75" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" disabled>
+                        <small class="text-secondary opacity-50 small">Username cannot be changed.</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                        <label class="form-label small text-secondary fw-semibold">Email Address</label>
+                        <input type="email" name="email" class="form-control bg-dark text-white border-secondary" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                     </div>
 
-                    <?php if ($user['role'] == 'student'): ?>
+                    <?php if (isset($user['role']) && $user['role'] == 'student'): ?>
                     <div class="mb-3">
-                        <label class="form-label">Registration Number</label>
-                        <input type="text" name="reg_number" class="form-control" value="<?php echo htmlspecialchars($user['reg_number'] ?? ''); ?>" required>
+                        <label class="form-label small text-secondary fw-semibold">Registration Number</label>
+                        <input type="text" name="reg_number" class="form-control bg-dark text-white border-secondary" value="<?php echo htmlspecialchars($user['reg_number'] ?? ''); ?>" required>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Year</label>
-                            <select name="year" class="form-select">
+                            <label class="form-label small text-secondary fw-semibold">Academic Year</label>
+                            <select name="year" class="form-select bg-dark text-white border-secondary">
                                 <?php for($i=1; $i<=5; $i++): ?>
-                                    <option value="<?php echo $i; ?>" <?php echo ($user['year'] == $i) ? 'selected' : ''; ?>>Year <?php echo $i; ?></option>
+                                    <option value="<?php echo $i; ?>" <?php echo (isset($user['year']) && $user['year'] == $i) ? 'selected' : ''; ?>>Year <?php echo $i; ?></option>
                                 <?php endfor; ?>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Semester</label>
-                            <select name="semester" class="form-select">
+                            <label class="form-label small text-secondary fw-semibold">Semester</label>
+                            <select name="semester" class="form-select bg-dark text-white border-secondary">
                                 <?php for($i=1; $i<=3; $i++): ?>
-                                    <option value="<?php echo $i; ?>" <?php echo ($user['semester'] == $i) ? 'selected' : ''; ?>>Semester <?php echo $i; ?></option>
+                                    <option value="<?php echo $i; ?>" <?php echo (isset($user['semester']) && $user['semester'] == $i) ? 'selected' : ''; ?>>Semester <?php echo $i; ?></option>
                                 <?php endfor; ?>
                             </select>
                         </div>
@@ -81,15 +81,15 @@ include 'includes/header.php';
                     <?php endif; ?>
 
                     <div class="mb-3">
-                        <label class="form-label">Role</label>
-                        <input type="text" class="form-control" value="<?php echo ucfirst($user['role']); ?>" disabled>
+                        <label class="form-label small text-secondary fw-semibold">Account Role</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary opacity-75" value="<?php echo ucfirst($user['role'] ?? 'User'); ?>" disabled>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Joined On</label>
-                        <input type="text" class="form-control" value="<?php echo date('M d, Y', strtotime($user['created_at'])); ?>" disabled>
+                        <label class="form-label small text-secondary fw-semibold">Joined On</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary opacity-75" value="<?php echo isset($user['created_at']) ? date('M d, Y', strtotime($user['created_at'])) : 'N/A'; ?>" disabled>
                     </div>
-                    <div class="d-grid">
-                        <button type="submit" name="update_profile" class="btn btn-primary">Update Email</button>
+                    <div class="d-grid pt-3">
+                        <button type="submit" name="update_profile" class="btn btn-primary fw-bold">Update Profile Information</button>
                     </div>
                 </form>
             </div>

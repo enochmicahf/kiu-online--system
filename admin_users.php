@@ -41,13 +41,13 @@ include 'includes/header.php';
 ?>
 
 <div class="card shadow-sm border-0">
-    <div class="card-header bg-white p-3">
-        <h5 class="mb-0"><i class="fas fa-users me-2"></i> All Registered Users</h5>
+    <div class="card-header bg-transparent border-secondary p-3">
+        <h5 class="mb-0 text-white fw-bold"><i class="fas fa-users me-2 text-primary"></i> All Registered Users</h5>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+            <table class="table table-dark table-hover mb-0">
+                <thead>
                     <tr>
                         <th>Username</th>
                         <th>Email</th>

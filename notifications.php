@@ -19,9 +19,8 @@ include 'includes/header.php';
 
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <h3>Notifications</h3>
-        <hr>
-        <ul class="list-group">
+        <h3 class="text-white fw-bold mb-4">Notifications</h3>
+        <ul class="list-group list-group-flush bg-dark border border-secondary rounded-3">
             <?php
             $stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC");
             $stmt->execute([$user_id]);
@@ -29,12 +28,15 @@ include 'includes/header.php';
 
             foreach ($notifications as $note):
             ?>
-                <li class="list-group-item <?php echo $note['is_read'] ? '' : 'list-group-item-info'; ?>">
-                    <p class="mb-1"><?php echo htmlspecialchars($note['message']); ?></p>
-                    <small class="text-muted"><?php echo $note['created_at']; ?></small>
+                <li class="list-group-item bg-transparent border-secondary py-3 <?php echo $note['is_read'] ? '' : 'bg-primary bg-opacity-10'; ?>">
+                    <p class="mb-1 text-white"><?php echo htmlspecialchars($note['message']); ?></p>
+                    <small class="text-secondary small opacity-75"><?php echo date('M d, Y H:i', strtotime($note['created_at'])); ?></small>
                 </li>
             <?php endforeach; if (empty($notifications)): ?>
-                <li class="list-group-item">No notifications found.</li>
+                <li class="list-group-item bg-transparent border-secondary text-secondary py-5 text-center">
+                    <i class="fas fa-bell-slash fs-2 mb-3 d-block opacity-25"></i>
+                    No notifications found.
+                </li>
             <?php endif; ?>
         </ul>
     </div>
