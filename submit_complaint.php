@@ -37,9 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $pdo->prepare("INSERT INTO complaints (student_id, category_id, title, description, attachment) VALUES (?, ?, ?, ?, ?)");
         if ($stmt->execute([$student_id, $category_id, $title, $description, $attachment_path])) {
             // Simple notification for staff
-            $stmt_staff = $pdo->query("SELECT id FROM users WHERE role = 'staff'");
-            while ($staff = $stmt_staff->fetch()) {
-                notify($staff['id'], "New complaint submitted by " . $_SESSION['username'] . ": " . $title);
+            if (function_exists('notify')) {
+                $stmt_staff = $pdo->query("SELECT id FROM users WHERE role = 'staff'");
+                while ($staff = $stmt_staff->fetch()) {
+                    notify($staff['id'], "New complaint submitted by " . $_SESSION['username'] . ": " . $title);
+                }
             }
             $success = "Complaint submitted successfully! <a href='dashboard.php' class='text-primary fw-bold text-decoration-none'>Go to Dashboard</a>";
         } else {

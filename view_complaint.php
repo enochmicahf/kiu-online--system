@@ -7,14 +7,14 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$id = $_GET['id'] ?? 0;
+$id = (int)($_GET['id'] ?? 0);
 $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 // Fetch complaint details
 $stmt = $pdo->prepare("SELECT c.*, u.username as student_name, u.reg_number, u.year, u.semester, cat.name as category_name
                        FROM complaints c
-                       JOIN users u ON c.student_id = u.id
+                       LEFT JOIN users u ON c.student_id = u.id
                        LEFT JOIN categories cat ON c.category_id = cat.id
                        WHERE c.id = ?");
 $stmt->execute([$id]);
@@ -32,7 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status']) && $r
     $stmt = $pdo->prepare("UPDATE complaints SET status = ?, admin_remarks = ? WHERE id = ?");
     $stmt->execute([$new_status, $admin_remarks, $id]);
 
-    notify($complaint['student_id'], "Your complaint #$id has been reviewed. Status: " . strtoupper(str_replace('_', ' ', $new_status)));
+    if (function_exists('notify')) {
+        notify($complaint['student_id'], "Your complaint #$id has been reviewed. Status: " . strtoupper(str_replace('_', ' ', $new_status)));
+    }
     header("Location: view_complaint.php?id=$id&msg=updated");
     exit();
 }
