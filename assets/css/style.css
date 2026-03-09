@@ -226,6 +226,7 @@ header.top-nav {
 .stat-icon.blue { background-color: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
 .stat-icon.grey { background-color: rgba(156, 163, 175, 0.15); color: var(--text-secondary); }
 .stat-icon.green { background-color: rgba(16, 185, 129, 0.15); color: var(--green-accent); }
+.stat-icon.yellow { background-color: rgba(245, 158, 11, 0.15); color: var(--yellow-accent); }
 
 /* Table */
 .table {

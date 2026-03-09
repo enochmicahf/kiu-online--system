@@ -53,6 +53,10 @@ if ($role == 'student') {
     $stmt = $pdo->query("SELECT COUNT(*) FROM complaints WHERE status = 'pending'");
     $pending_complaints = $stmt->fetchColumn();
 
+    // Pending Verification (Students)
+    $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'student' AND is_verified = 0");
+    $pending_verifications = $stmt->fetchColumn();
+
     // Resolved Complaints
     $stmt = $pdo->query("SELECT COUNT(*) FROM complaints WHERE status = 'resolved'");
     $resolved_complaints = $stmt->fetchColumn();
@@ -83,10 +87,10 @@ include 'includes/header.php';
 
     <!-- Stats Grid -->
     <div class="row g-4 mb-5">
-        <div class="col-lg-4">
+        <div class="col-lg-<?php echo $role != 'student' ? '3' : '4'; ?>">
             <div class="card stat-card mb-0 h-100">
                 <div class="stat-info">
-                    <p class="stat-label">MY TOTAL COMPLAINTS</p>
+                    <p class="stat-label"><?php echo $role == 'student' ? 'MY TOTAL COMPLAINTS' : 'TOTAL SYSTEM COMPLAINTS'; ?></p>
                     <h2 class="stat-value"><?php echo $total_complaints; ?></h2>
                 </div>
                 <div class="stat-icon blue">
@@ -94,10 +98,10 @@ include 'includes/header.php';
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-<?php echo $role != 'student' ? '3' : '4'; ?>">
             <div class="card stat-card mb-0 h-100">
                 <div class="stat-info">
-                    <p class="stat-label">MY PENDING COMPLAINTS</p>
+                    <p class="stat-label"><?php echo $role == 'student' ? 'MY PENDING COMPLAINTS' : 'PENDING ACTION'; ?></p>
                     <h2 class="stat-value"><?php echo $pending_complaints; ?></h2>
                 </div>
                 <div class="stat-icon grey">
@@ -105,10 +109,23 @@ include 'includes/header.php';
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
+        <?php if ($role != 'student'): ?>
+        <div class="col-lg-3">
+            <div class="card stat-card mb-0 h-100 border-start border-4 border-warning">
+                <div class="stat-info">
+                    <p class="stat-label">STUDENT VERIFICATIONS</p>
+                    <h2 class="stat-value text-warning"><?php echo $pending_verifications; ?></h2>
+                </div>
+                <div class="stat-icon yellow">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+        <div class="col-lg-<?php echo $role != 'student' ? '3' : '4'; ?>">
             <div class="card stat-card mb-0 h-100">
                 <div class="stat-info">
-                    <p class="stat-label">RESOLVED COMPLAINTS</p>
+                    <p class="stat-label">RESOLVED CASES</p>
                     <h2 class="stat-value text-success"><?php echo $resolved_complaints; ?></h2>
                 </div>
                 <div class="stat-icon green">

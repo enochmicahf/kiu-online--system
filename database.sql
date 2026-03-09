@@ -10,6 +10,7 @@ CREATE TABLE users (
     reg_number VARCHAR(50),
     year INT,
     semester INT,
+    is_verified TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

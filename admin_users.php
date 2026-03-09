@@ -21,6 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_role'])) {
     }
 }
 
+// Handle Student Verification
+if (isset($_GET['verify']) && is_numeric($_GET['verify'])) {
+    $target_user_id = $_GET['verify'];
+    $status = $_GET['status'] ?? 1;
+    $stmt = $pdo->prepare("UPDATE users SET is_verified = ? WHERE id = ? AND role = 'student'");
+    $stmt->execute([$status, $target_user_id]);
+    header("Location: admin_users.php?msg=verification_updated");
+    exit();
+}
+
 // Handle User Deletion
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $target_user_id = $_GET['delete'];
@@ -49,18 +59,41 @@ include 'includes/header.php';
             <table class="table table-dark table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Username</th>
+                        <th>User & Academic Info</th>
                         <th>Email</th>
-                        <th>Role</th>
-                        <th>Registered On</th>
-                        <th>Action</th>
+                        <th>Verification</th>
+                        <th style="width: 150px;">Role</th>
+                        <th>Joined</th>
+                        <th class="text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($users as $u): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($u['username']); ?></td>
-                        <td><?php echo htmlspecialchars($u['email']); ?></td>
+                        <td>
+                            <div class="fw-bold text-white"><?php echo htmlspecialchars($u['username']); ?></div>
+                            <?php if($u['role'] == 'student'): ?>
+                                <small class="text-info"><?php echo htmlspecialchars($u['reg_number'] ?? 'N/A'); ?> | Yr <?php echo $u['year'] ?? '?'; ?> Sem <?php echo $u['semester'] ?? '?'; ?></small>
+                            <?php endif; ?>
+                        </td>
+                        <td><small class="text-secondary"><?php echo htmlspecialchars($u['email']); ?></small></td>
+                        <td>
+                            <?php if($u['role'] == 'student'): ?>
+                                <?php if($u['is_verified']): ?>
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3">
+                                        <i class="fas fa-check-circle me-1"></i> Verified
+                                    </span>
+                                    <a href="admin_users.php?verify=<?php echo $u['id']; ?>&status=0" class="ms-2 text-warning small text-decoration-none">Revoke</a>
+                                <?php else: ?>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3">
+                                        <i class="fas fa-times-circle me-1"></i> Pending
+                                    </span>
+                                    <a href="admin_users.php?verify=<?php echo $u['id']; ?>&status=1" class="btn btn-primary btn-sm py-0 px-2 ms-2" style="font-size: 0.7rem;">Verify Student</a>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <span class="text-secondary small">--</span>
+                            <?php endif; ?>
+                        </td>
                         <td>
                             <form method="POST" class="d-inline">
                                 <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
@@ -72,10 +105,10 @@ include 'includes/header.php';
                                 <input type="hidden" name="update_role" value="1">
                             </form>
                         </td>
-                        <td><?php echo date('M d, Y', strtotime($u['created_at'])); ?></td>
-                        <td>
+                        <td><small class="text-secondary"><?php echo date('M d, Y', strtotime($u['created_at'])); ?></small></td>
+                        <td class="text-end">
                             <?php if ($u['id'] != $_SESSION['user_id']): ?>
-                                <a href="admin_users.php?delete=<?php echo $u['id']; ?>" class="text-danger" onclick="return confirm('Delete this user?')"><i class="fas fa-trash"></i></a>
+                                <a href="admin_users.php?delete=<?php echo $u['id']; ?>" class="text-danger opacity-50 hover-opacity-100" onclick="return confirm('Delete this user?')"><i class="fas fa-trash"></i></a>
                             <?php endif; ?>
                         </td>
                     </tr>
