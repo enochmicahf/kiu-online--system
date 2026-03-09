@@ -18,10 +18,9 @@
     <!-- Sidebar Navigation -->
     <aside id="sidebar">
         <div class="sidebar-brand-area">
-            <span class="sidebar-label">Admin Panel</span>
-            <div class="logo-box">
-                <div class="logo-text">VJ<span>Pr</span>one</div>
-            </div>
+            <span class="sidebar-label">University Support</span>
+            <h3 class="text-primary fw-bold mb-0" style="letter-spacing: -1px;">KIU</h3>
+            <p class="text-white small opacity-50 mb-0">Complaint System</p>
         </div>
 
         <ul class="nav-links">

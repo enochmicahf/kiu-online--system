@@ -52,9 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div class="auth-wrapper d-flex align-items-center justify-content-center py-5" style="min-height: 100vh;">
     <div class="card bg-dark border-secondary p-4" style="width: 100%; max-width: 500px; border-radius: 12px;">
         <div class="text-center mb-4">
-            <div class="logo-box mb-3" style="background: #fff; padding: 10px; border-radius: 6px; display: inline-block;">
-                <div class="logo-text" style="color: #000; font-weight: 800; font-size: 1.4rem; font-style: italic;">VJ<span style="color: #e11d48;">Pr</span>one</div>
-            </div>
+            <h1 class="text-primary fw-bold mb-1" style="letter-spacing: -1px; font-size: 2.5rem;">KIU</h1>
+            <h5 class="text-white opacity-75 fw-semibold mb-4">Online Complaint System</h5>
             <h4 class="text-white fw-bold">Student Registration</h4>
         </div>
 
