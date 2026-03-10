@@ -174,7 +174,7 @@ include 'includes/header.php';
                             <label class="form-label small text-secondary">Current Status</label>
                             <select name="status" class="form-select bg-dark text-white border-secondary">
                                 <option value="pending" <?php echo $complaint['status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
-                                <option value="approved" <?php echo $complaint['status'] == 'approved' ? 'selected' : ''; ?>>Approved</option>
+                                <option value="approved" <?php echo $complaint['status'] == 'approved' ? 'selected' : ''; ?> style="background: #3b82f6; color: white; font-weight: bold;">Approved (Finalize Details)</option>
                                 <option value="in_progress" <?php echo $complaint['status'] == 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
                                 <option value="resolved" <?php echo $complaint['status'] == 'resolved' ? 'selected' : ''; ?>>Resolved</option>
                                 <option value="closed" <?php echo $complaint['status'] == 'closed' ? 'selected' : ''; ?>>Closed</option>

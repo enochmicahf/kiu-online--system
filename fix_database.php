@@ -32,6 +32,15 @@ try {
         $pdo->exec("ALTER TABLE users ADD COLUMN is_verified TINYINT(1) DEFAULT 0 AFTER semester");
     }
 
+    // Create announcements table if not exists
+    $pdo->exec("CREATE TABLE IF NOT EXISTS announcements (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        content TEXT NOT NULL,
+        priority ENUM('info', 'warning', 'danger') DEFAULT 'info',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
     echo "Database schema is up to date.\n";
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";

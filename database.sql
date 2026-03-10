@@ -53,6 +53,18 @@ CREATE TABLE notifications (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE announcements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    priority ENUM('info', 'warning', 'danger') DEFAULT 'info',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO announcements (title, content, priority) VALUES
+('System Update', 'The KIU Complaint Management System is now live.', 'info'),
+('Maintenance Notice', 'Scheduled maintenance on Sunday 2:00 AM.', 'warning');
+
 -- Insert initial categories
 INSERT INTO categories (name, description) VALUES
 ('Academic', 'Issues related to lectures, exams, and grades'),

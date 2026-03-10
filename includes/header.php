@@ -45,6 +45,12 @@
                         <span>Users</span>
                     </a>
                 </li>
+                <li class="<?php echo ($current_page == 'announcements') ? 'active' : ''; ?>">
+                    <a href="admin_announcements.php">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Announcements</span>
+                    </a>
+                </li>
             <?php endif; ?>
 
             <li class="<?php echo ($current_page == 'notifications') ? 'active' : ''; ?>">

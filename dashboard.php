@@ -220,23 +220,39 @@ include 'includes/header.php';
             <!-- Announcements/Quick Tips -->
             <div class="card mb-0">
                 <div class="card-header">
-                    <h6 class="mb-0 text-white fw-bold">Recent Announcements</h6>
+                    <h6 class="mb-0 text-white fw-bold">System Announcements</h6>
                 </div>
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush bg-transparent">
-                        <li class="list-group-item bg-transparent border-secondary py-3 px-4">
-                            <h6 class="text-info small fw-bold mb-1">System Version 2.0 Launched</h6>
-                            <p class="text-secondary small mb-0 opacity-75">The complaint management system has been updated with a high-fidelity dark theme for better visibility.</p>
-                        </li>
-                        <li class="list-group-item bg-transparent border-secondary py-3 px-4">
-                            <h6 class="text-warning small fw-bold mb-1">Upcoming Maintenance</h6>
-                            <p class="text-secondary small mb-0 opacity-75">Scheduled database maintenance this Sunday between 02:00 AM and 04:00 AM. System may be intermittent.</p>
-                        </li>
+                        <?php
+                        $stmt_ann = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC LIMIT 5");
+                        $dyn_announcements = $stmt_ann->fetchAll();
+
+                        if ($dyn_announcements):
+                            foreach ($dyn_announcements as $da):
+                        ?>
+                            <li class="list-group-item bg-transparent border-secondary py-3 px-4">
+                                <h6 class="text-<?php echo $da['priority'] == 'info' ? 'info' : ($da['priority'] == 'warning' ? 'warning' : 'danger'); ?> small fw-bold mb-1">
+                                    <?php echo htmlspecialchars($da['title']); ?>
+                                </h6>
+                                <p class="text-secondary small mb-0 opacity-75"><?php echo htmlspecialchars($da['content']); ?></p>
+                                <small class="text-secondary opacity-50" style="font-size: 0.65rem;"><?php echo date('M d, Y', strtotime($da['created_at'])); ?></small>
+                            </li>
+                        <?php
+                            endforeach;
+                        else:
+                        ?>
+                            <li class="list-group-item bg-transparent border-secondary py-4 px-4 text-center">
+                                <p class="text-secondary small mb-0">No announcements yet.</p>
+                            </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
+                <?php if ($role == 'admin'): ?>
                 <div class="card-footer bg-transparent border-secondary text-center">
-                    <a href="#" class="text-primary small text-decoration-none fw-bold">View All Announcements <i class="fas fa-chevron-right ms-1"></i></a>
+                    <a href="admin_announcements.php" class="text-primary small text-decoration-none fw-bold">Manage Announcements <i class="fas fa-chevron-right ms-1"></i></a>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
