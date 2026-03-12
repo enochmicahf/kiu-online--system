@@ -48,7 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
 
         <?php if ($error): ?>
-            <div class="alert alert-danger py-2 small"><?php echo $error; ?></div>
+            <div class="alert alert-danger py-2 small">
+                <?php echo $error; ?>
+                <?php if (trim($_POST['username']) == 'admin'): ?>
+                    <div class="mt-2 pt-2 border-top border-danger border-opacity-25" style="font-size: 0.75rem;">
+                        <strong>Tip:</strong> If you are the admin, ensure you have run <code>setup_admin.php</code> to initialize your account.
+                    </div>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
         <form method="POST">

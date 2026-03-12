@@ -42,4 +42,13 @@ The system uses a unified dashboard that changes features based on your login ro
 - **Student Verification:** Admins can verify registration numbers and academic details.
 
 ---
+
+## 🛠 Troubleshooting
+
+### "Invalid username or password"
+If you cannot log in with the default admin credentials:
+1. Ensure you have run `setup_admin.php` in your browser.
+2. If you still have issues, running `setup_admin.php` again will **reset** the 'admin' password to `admin`.
+3. Check that your database connection is correct in `includes/config.php`.
+
 Developed for KIU Support System.

@@ -18,7 +18,10 @@ try {
         $stmt->execute([$username, $email, $hashed]);
         echo "Default admin account created: admin / admin\n";
     } else {
-        echo "Admin account already exists.\n";
+        $hashed = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("UPDATE users SET password = ?, role = 'admin', is_verified = 1 WHERE username = ?");
+        $stmt->execute([$hashed, $username]);
+        echo "Admin account already exists. Password has been reset to 'admin'.\n";
     }
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "\n";
