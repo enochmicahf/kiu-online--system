@@ -53,8 +53,11 @@ include 'includes/header.php';
 ?>
 
 <div class="card shadow-sm border-0">
-    <div class="card-header bg-transparent border-secondary p-3">
+    <div class="card-header bg-transparent border-secondary p-3 d-flex justify-content-between align-items-center gap-3">
         <h5 class="mb-0 text-white fw-bold"><i class="fas fa-users me-2 text-primary"></i> All Registered Users</h5>
+        <a href="init_admin.php" class="btn btn-primary btn-sm fw-bold">
+            <i class="fas fa-user-plus me-2"></i>Create Staff/Admin
+        </a>
     </div>
     <div class="card-body p-0">
         <?php if (isset($_GET['msg'])): ?>
