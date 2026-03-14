@@ -2,33 +2,39 @@
 
 This system is designed for Kampala International University (KIU) to manage student complaints.
 
-## 🛠 HOW TO START (FOLLOW THESE STEPS)
+## 🚀 LIVE SERVER SETUP (aaPanel / VPS)
 
-If you are having trouble logging in, please follow these exact steps:
+Since you are hosting this on a live server (like aaPanel), please follow these exact steps:
 
-### Step 1: Create the Database
-- Open your database tool (like **phpMyAdmin**).
-- Create a new database named `kiu_complaints`.
-- Import the file `database.sql` into that database.
+### Step 1: Create the Database in aaPanel
+1. Go to your **aaPanel** dashboard -> **Databases**.
+2. Click **Add Database**.
+3. Use `kiu_complaints` as the name (or any name you prefer).
+4. **Note down** the Database Username and Password provided by aaPanel.
+5. Click **Import** next to your new database and upload the `database.sql` file.
 
 ### Step 2: Configure Connection
-- Open the file `includes/config.php` in a text editor.
-- Make sure `DB_USER` (usually `root`) and `DB_PASS` (usually empty `''`) match your computer's settings.
+1. Open the file `includes/config.php` in the aaPanel File Manager.
+2. Update the details with the ones you noted in Step 1:
+   - `DB_HOST`: Keep as `localhost` (usually works on aaPanel).
+   - `DB_NAME`: Use your aaPanel database name.
+   - `DB_USER`: Use your aaPanel database username.
+   - `DB_PASS`: Use your aaPanel database password.
 
-### Step 3: Run the Setup Scripts (IMPORTANT)
-Open your web browser and visit these two links one by one:
-1. `http://localhost/fix_database.php` (Fixes the tables)
-2. `http://localhost/setup_admin.php` (Creates the **admin** user)
+### Step 3: Run Setup Scripts (IMPORTANT)
+Open your web browser and visit these links using **your domain name**:
+1. `http://your-domain.com/fix_database.php` (Fixes the tables)
+2. `http://your-domain.com/setup_admin.php` (Creates the **admin** user)
 
 ### Step 4: Login as Admin
-- Visit: `http://localhost/login.php`
+- Visit: `http://your-domain.com/login.php`
 - **Username:** `admin`
 - **Password:** `admin`
 
 ---
 
 ## 🔍 Still having issues?
-Visit `http://localhost/debug_connection.php` in your browser. It will tell you exactly what is wrong (e.g., if the database is missing or the admin account wasn't created).
+Visit `http://your-domain.com/debug_connection.php` in your browser. It will tell you exactly what is wrong (e.g., if the database username/password in `config.php` is wrong).
 
 ---
 Developed for KIU Support.
