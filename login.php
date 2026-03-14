@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user = $stmt->fetch();
 
     if ($user && is_array($user) && isset($user['password']) && password_verify($password, $user['password'])) {
+        session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
@@ -52,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php echo $error; ?>
                 <?php if (trim($_POST['username']) == 'admin'): ?>
                     <div class="mt-2 pt-2 border-top border-danger border-opacity-25" style="font-size: 0.75rem;">
-                        <strong>Tip:</strong> If you are the admin, ensure you have run <code>setup_admin.php</code> to initialize your account.
+                        <strong>Tip:</strong> If you are the admin, ensure you have completed <code>setup_admin.php</code> and are using the credentials you created there.
                     </div>
                 <?php endif; ?>
             </div>

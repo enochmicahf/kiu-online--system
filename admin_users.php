@@ -1,44 +1,46 @@
 <?php
 session_start();
 require_once 'includes/db.php';
+require_once 'includes/security.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
-    header("Location: dashboard.php");
-    exit();
+if (!current_user_is_admin()) {
+    redirect_to('dashboard.php');
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_valid_csrf_token();
 }
 
 // Handle User Role Change
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_role'])) {
-    $target_user_id = $_POST['user_id'];
-    $new_role = $_POST['role'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
+    $target_user_id = (int) ($_POST['user_id'] ?? 0);
+    $new_role = $_POST['role'] ?? '';
+    $allowed_roles = ['student', 'staff', 'admin'];
 
     // Prevent admin from changing their own role to something else
-    if ($target_user_id != $_SESSION['user_id']) {
+    if ($target_user_id > 0 && $target_user_id !== (int) $_SESSION['user_id'] && in_array($new_role, $allowed_roles, true)) {
         $stmt = $pdo->prepare("UPDATE users SET role = ? WHERE id = ?");
         $stmt->execute([$new_role, $target_user_id]);
-        header("Location: admin_users.php?msg=updated");
-        exit();
+        redirect_to('admin_users.php?msg=updated');
     }
 }
 
 // Handle Student Verification
-if (isset($_GET['verify']) && is_numeric($_GET['verify'])) {
-    $target_user_id = $_GET['verify'];
-    $status = $_GET['status'] ?? 1;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_student'])) {
+    $target_user_id = (int) ($_POST['user_id'] ?? 0);
+    $status = (($_POST['status'] ?? '1') === '1') ? 1 : 0;
     $stmt = $pdo->prepare("UPDATE users SET is_verified = ? WHERE id = ? AND role = 'student'");
     $stmt->execute([$status, $target_user_id]);
-    header("Location: admin_users.php?msg=verification_updated");
-    exit();
+    redirect_to('admin_users.php?msg=verification_updated');
 }
 
 // Handle User Deletion
-if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-    $target_user_id = $_GET['delete'];
-    if ($target_user_id != $_SESSION['user_id']) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
+    $target_user_id = (int) ($_POST['user_id'] ?? 0);
+    if ($target_user_id > 0 && $target_user_id !== (int) $_SESSION['user_id']) {
         $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$target_user_id]);
-        header("Location: admin_users.php?msg=deleted");
-        exit();
+        redirect_to('admin_users.php?msg=deleted');
     }
 }
 
@@ -55,6 +57,18 @@ include 'includes/header.php';
         <h5 class="mb-0 text-white fw-bold"><i class="fas fa-users me-2 text-primary"></i> All Registered Users</h5>
     </div>
     <div class="card-body p-0">
+        <?php if (isset($_GET['msg'])): ?>
+            <div class="alert alert-success border-0 rounded-0 mb-0">
+                <?php
+                $messages = [
+                    'updated' => 'User role updated successfully.',
+                    'verification_updated' => 'Student verification updated successfully.',
+                    'deleted' => 'User deleted successfully.',
+                ];
+                echo htmlspecialchars($messages[$_GET['msg']] ?? 'Changes saved.');
+                ?>
+            </div>
+        <?php endif; ?>
         <div class="table-responsive">
             <table class="table table-dark table-hover mb-0">
                 <thead>
@@ -83,12 +97,10 @@ include 'includes/header.php';
                                     <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3">
                                         <i class="fas fa-check-circle me-1"></i> Verified
                                     </span>
-                                    <a href="admin_users.php?verify=<?php echo $u['id']; ?>&status=0" class="ms-2 text-warning small text-decoration-none">Revoke</a>
                                 <?php else: ?>
                                     <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3">
                                         <i class="fas fa-times-circle me-1"></i> Pending
                                     </span>
-                                    <a href="admin_users.php?verify=<?php echo $u['id']; ?>&status=1" class="btn btn-primary btn-sm py-0 px-2 ms-2" style="font-size: 0.7rem;">Verify Student</a>
                                 <?php endif; ?>
                             <?php else: ?>
                                 <span class="text-secondary small">--</span>
@@ -97,7 +109,8 @@ include 'includes/header.php';
                         <td>
                             <form method="POST" class="d-inline">
                                 <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
-                                <select name="role" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                                <?php echo csrf_input(); ?>
+                                <select name="role" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()" <?php echo ($u['id'] == $_SESSION['user_id']) ? 'disabled' : ''; ?>>
                                     <option value="student" <?php if($u['role'] == 'student') echo 'selected'; ?>>Student</option>
                                     <option value="staff" <?php if($u['role'] == 'staff') echo 'selected'; ?>>Staff</option>
                                     <option value="admin" <?php if($u['role'] == 'admin') echo 'selected'; ?>>Admin</option>
@@ -107,9 +120,29 @@ include 'includes/header.php';
                         </td>
                         <td><small class="text-secondary"><?php echo date('M d, Y', strtotime($u['created_at'])); ?></small></td>
                         <td class="text-end">
-                            <?php if ($u['id'] != $_SESSION['user_id']): ?>
-                                <a href="admin_users.php?delete=<?php echo $u['id']; ?>" class="text-danger opacity-50 hover-opacity-100" onclick="return confirm('Delete this user?')"><i class="fas fa-trash"></i></a>
-                            <?php endif; ?>
+                            <div class="d-flex justify-content-end align-items-center gap-2">
+                                <?php if($u['role'] == 'student'): ?>
+                                    <form method="POST" class="d-inline">
+                                        <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
+                                        <input type="hidden" name="status" value="<?php echo $u['is_verified'] ? '0' : '1'; ?>">
+                                        <input type="hidden" name="verify_student" value="1">
+                                        <?php echo csrf_input(); ?>
+                                        <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none <?php echo $u['is_verified'] ? 'text-warning' : 'text-primary'; ?>">
+                                            <?php echo $u['is_verified'] ? 'Revoke' : 'Verify'; ?>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                                <?php if ($u['id'] != $_SESSION['user_id']): ?>
+                                    <form method="POST" class="d-inline" onsubmit="return confirm('Delete this user?')">
+                                        <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
+                                        <input type="hidden" name="delete_user" value="1">
+                                        <?php echo csrf_input(); ?>
+                                        <button type="submit" class="btn btn-link text-danger opacity-50 hover-opacity-100 p-0 border-0">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

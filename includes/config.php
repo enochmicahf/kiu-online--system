@@ -15,4 +15,5 @@ define('DB_NAME', 'kiu_complaints'); // REPLACE WITH YOUR AAPANEL DB NAME
 
 define('SITE_NAME', 'KIU Online Complaint System');
 define('UPLOADS_DIR', 'uploads/attachments/');
+define('ADMIN_SETUP_TOKEN', ''); // Set a long random value before using setup_admin.php or maintenance tools, then clear it afterwards.
 ?>

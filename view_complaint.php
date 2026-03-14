@@ -1,10 +1,10 @@
 <?php
 session_start();
 require_once 'includes/db.php';
+require_once 'includes/security.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
+    redirect_to('login.php');
 }
 
 $id = (int)($_GET['id'] ?? 0);
@@ -24,30 +24,37 @@ if (!$complaint || ($role == 'student' && $complaint['student_id'] != $user_id))
     die("Unauthorized or not found.");
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_valid_csrf_token();
+}
+
 // Handle Status Update and Admin Remarks (Staff/Admin only)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status']) && $role != 'student') {
-    $new_status = $_POST['status'];
+    $new_status = $_POST['status'] ?? '';
     $admin_remarks = trim($_POST['admin_remarks']);
+    $allowed_statuses = ['pending', 'approved', 'in_progress', 'resolved', 'closed'];
 
-    $stmt = $pdo->prepare("UPDATE complaints SET status = ?, admin_remarks = ? WHERE id = ?");
-    $stmt->execute([$new_status, $admin_remarks, $id]);
+    if (in_array($new_status, $allowed_statuses, true)) {
+        $stmt = $pdo->prepare("UPDATE complaints SET status = ?, admin_remarks = ? WHERE id = ?");
+        $stmt->execute([$new_status, $admin_remarks, $id]);
 
-    if (function_exists('notify')) {
-        notify($complaint['student_id'], "Your complaint #$id has been reviewed. Status: " . strtoupper(str_replace('_', ' ', $new_status)));
+        if (function_exists('notify')) {
+            notify($complaint['student_id'], "Your complaint #$id has been reviewed. Status: " . strtoupper(str_replace('_', ' ', $new_status)));
+        }
     }
-    header("Location: view_complaint.php?id=$id&msg=updated");
-    exit();
+    redirect_to("view_complaint.php?id=$id&msg=updated");
 }
 
 // Handle Feedback (Student only)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_feedback']) && $role == 'student' && $complaint['status'] == 'resolved') {
-    $rating = $_POST['rating'];
+    $rating = (int) ($_POST['rating'] ?? 0);
     $comment = trim($_POST['comment']);
 
-    $stmt = $pdo->prepare("INSERT INTO feedback (complaint_id, rating, comment) VALUES (?, ?, ?)");
-    $stmt->execute([$id, $rating, $comment]);
-    header("Location: view_complaint.php?id=$id&msg=feedback_sent");
-    exit();
+    if ($rating >= 1 && $rating <= 5) {
+        $stmt = $pdo->prepare("INSERT INTO feedback (complaint_id, rating, comment) VALUES (?, ?, ?)");
+        $stmt->execute([$id, $rating, $comment]);
+        redirect_to("view_complaint.php?id=$id&msg=feedback_sent");
+    }
 }
 
 // Fetch feedback if any
@@ -56,6 +63,7 @@ $stmt->execute([$id]);
 $feedback = $stmt->fetch();
 
 $page_title = "Complaint Details";
+$current_page = 'complaints';
 include 'includes/header.php';
 ?>
 
@@ -126,6 +134,7 @@ include 'includes/header.php';
                 </div>
                 <div class="card-body">
                     <form method="POST">
+                        <?php echo csrf_input(); ?>
                         <div class="mb-3">
                             <label class="form-label small text-secondary">Rating (1-5)</label>
                             <select name="rating" class="form-select bg-dark text-white border-secondary">
@@ -170,6 +179,7 @@ include 'includes/header.php';
                 </div>
                 <div class="card-body">
                     <form method="POST">
+                        <?php echo csrf_input(); ?>
                         <div class="mb-3">
                             <label class="form-label small text-secondary">Current Status</label>
                             <select name="status" class="form-select bg-dark text-white border-secondary">

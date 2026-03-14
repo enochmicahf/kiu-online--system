@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <?php $current_page = $current_page ?? ''; ?>
     <?php if (isset($_SESSION['user_id'])): ?>
     <!-- Sidebar Navigation -->
     <aside id="sidebar">
@@ -38,7 +39,7 @@
                 </a>
             </li>
 
-            <?php if ($_SESSION['role'] == 'admin'): ?>
+            <?php if (($_SESSION['role'] ?? '') == 'admin'): ?>
                 <li class="<?php echo ($current_page == 'users') ? 'active' : ''; ?>">
                     <a href="admin_users.php">
                         <i class="fas fa-users"></i>

@@ -1,30 +1,49 @@
 <?php
 session_start();
 require_once 'includes/db.php';
+require_once 'includes/security.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
-    header("Location: dashboard.php");
-    exit();
+if (!current_user_is_admin()) {
+    redirect_to('dashboard.php');
 }
 
 $message = "";
+$message_type = "success";
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_announcement'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_valid_csrf_token();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_announcement'])) {
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
-    $priority = $_POST['priority'];
+    $priority = $_POST['priority'] ?? 'info';
+    $allowed_priorities = ['info', 'warning', 'danger'];
 
-    $stmt = $pdo->prepare("INSERT INTO announcements (title, content, priority) VALUES (?, ?, ?)");
-    if ($stmt->execute([$title, $content, $priority])) {
-        $message = "Announcement posted successfully!";
+    if ($title !== '' && $content !== '' && in_array($priority, $allowed_priorities, true)) {
+        $stmt = $pdo->prepare("INSERT INTO announcements (title, content, priority) VALUES (?, ?, ?)");
+        if ($stmt->execute([$title, $content, $priority])) {
+            $message = "Announcement posted successfully!";
+        }
+    } else {
+        $message = "Please provide a valid title, message, and priority.";
+        $message_type = "danger";
     }
 }
 
-if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-    $stmt = $pdo->prepare("DELETE FROM announcements WHERE id = ?");
-    $stmt->execute([$_GET['delete']]);
-    header("Location: admin_announcements.php?msg=deleted");
-    exit();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_announcement'])) {
+    $announcement_id = (int) ($_POST['announcement_id'] ?? 0);
+    if ($announcement_id > 0) {
+        $stmt = $pdo->prepare("DELETE FROM announcements WHERE id = ?");
+        $stmt->execute([$announcement_id]);
+        redirect_to('admin_announcements.php?msg=deleted');
+    }
+}
+
+if (isset($_GET['msg']) && $_GET['msg'] === 'deleted') {
+    if ($message === '') {
+        $message = "Announcement deleted successfully!";
+    }
 }
 
 $stmt = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC");
@@ -43,9 +62,10 @@ include 'includes/header.php';
             </div>
             <div class="card-body">
                 <?php if ($message): ?>
-                    <div class="alert alert-success border-0 small py-2"><?php echo $message; ?></div>
+                    <div class="alert alert-<?php echo $message_type; ?> border-0 small py-2"><?php echo htmlspecialchars($message); ?></div>
                 <?php endif; ?>
                 <form method="POST">
+                    <?php echo csrf_input(); ?>
                     <div class="mb-3">
                         <label class="form-label small text-secondary">Announcement Title</label>
                         <input type="text" name="title" class="form-control" required>
@@ -100,9 +120,14 @@ include 'includes/header.php';
                                 </td>
                                 <td><small class="text-secondary"><?php echo date('M d, Y', strtotime($a['created_at'])); ?></small></td>
                                 <td class="text-end">
-                                    <a href="admin_announcements.php?delete=<?php echo $a['id']; ?>" class="text-danger opacity-50 hover-opacity-100" onclick="return confirm('Delete this announcement?')">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <form method="POST" class="d-inline" onsubmit="return confirm('Delete this announcement?')">
+                                        <input type="hidden" name="announcement_id" value="<?php echo $a['id']; ?>">
+                                        <input type="hidden" name="delete_announcement" value="1">
+                                        <?php echo csrf_input(); ?>
+                                        <button type="submit" class="btn btn-link text-danger opacity-50 hover-opacity-100 p-0 border-0">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             <?php endforeach; if(empty($announcements)): ?>
